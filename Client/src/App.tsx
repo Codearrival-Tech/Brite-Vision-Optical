@@ -8,6 +8,7 @@ import ContactSection from './Pages/ContactSection';
 import  TestimonialSection from './Pages/TestimonialSection';
 import FAQSection from './Pages/FAQSection';
 import Footer from './Pages/Footer';
+import MapSection from './Pages/MapSection';
 
 
 
@@ -29,6 +30,7 @@ const App: React.FC = () => {
         <HowItWorks />
         <WhyChooseUs />
         <ContactSection />
+        <MapSection />
         <TestimonialSection />
         <FAQSection /> 
         <Footer />

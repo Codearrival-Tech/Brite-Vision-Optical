@@ -7,11 +7,11 @@ interface NavLink {
 }
 
 const NAV_LINKS: NavLink[] = [
-  { name: "Home", href: "#" },
-  { name: "Shop", href: "#" },
-  { name: "Contact", href: "#" },
-  { name: "About", href: "#" },
-  { name: "Help", href: "#" },
+  { name: "Home", href: "#home" },
+  { name: "Shop", href: "#contact-booking" },
+  { name: "Contact", href: "#contact" },
+  { name: "Eye Test", href: "#contact-appointment" },
+  { name: "About", href: "#about" },
 ];
 
 const Navbar: React.FC = () => {
@@ -58,7 +58,7 @@ const Navbar: React.FC = () => {
         <div className="flex items-center justify-between h-14">
           {/* ── Logo ── */}
           <a
-            href="#"
+            href="#home"
             aria-label="Brite Vision Optical – home"
             className="flex items-center gap-2.5 flex-shrink-0 group"
           >

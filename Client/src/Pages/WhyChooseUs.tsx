@@ -45,7 +45,7 @@ const trustItems = [
 
 const WhyChooseUs: React.FC = () => {
   return (
-    <section className="py-24 md:py-10 bg-slate-50/30">
+    <section id="about" className="scroll-mt-28 py-24 md:py-10 bg-slate-50/30">
       <div className="max-w-7xl mx-auto px-6">
         
         {/* Section Header */}

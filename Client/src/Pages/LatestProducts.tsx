@@ -1,9 +1,10 @@
 import React from 'react';
+import image from '../assets/SunGlass.jpg'
 
 // Replace these with your actual image paths
 // Suggestion: Use clean, high-resolution lifestyle shots of eyewear
-const GlassImage1 = "https://images.unsplash.com/photo-1574258495973-f010dfbb5371?q=80&w=2070&auto=format&fit=crop"; 
-const GlassImage2 = "https://images.unsplash.com/photo-1511499767350-a1590fdb7307?q=80&w=2080&auto=format&fit=crop";
+// const GlassImage1 = "https://images.unsplash.com/photo-1574258495973-f010dfbb5371?q=80&w=2070&auto=format&fit=crop"; 
+// const GlassImage2 = "https://images.unsplash.com/photo-1511499767350-a1590fdb7307?q=80&w=2080&auto=format&fit=crop";
 
 const LatestProducts: React.FC = () => {
   return (
@@ -25,7 +26,7 @@ const LatestProducts: React.FC = () => {
           {/* Main Large Featured Card */}
           <div className="md:col-span-2 md:row-span-2 relative group overflow-hidden rounded-[var(--radius)] bg-slate-100 border border-slate-200 transition-all hover:shadow-2xl hover:shadow-[var(--brand-primary)]/10">
             <img 
-              src={GlassImage1} 
+              src={image} 
               alt="Premium Eyewear" 
               className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
             />
@@ -42,7 +43,7 @@ const LatestProducts: React.FC = () => {
           {/* Landscape Secondary Card */}
           <div className="md:col-span-2 md:row-span-1 relative group overflow-hidden rounded-[var(--radius)] bg-white border border-slate-200 transition-all hover:shadow-lg">
              <img 
-              src={GlassImage2} 
+              src={image} 
               alt="Sunglasses Collection" 
               className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
              />

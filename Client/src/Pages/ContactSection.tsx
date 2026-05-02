@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import {
   MapPin,
   Phone,
@@ -8,7 +9,11 @@ import {
   MessageSquare,
   ShoppingBag,
   Eye,
+  Loader2,
 } from "lucide-react";
+
+// Assuming your axios.ts exports: export const API = { CONTACT: '...', EYE_TEST: '...', BOOK_FRAME: '...' }
+import { API } from "../api/axios"; 
 
 type FormType = "contact" | "appointment" | "booking";
 
@@ -61,21 +66,9 @@ const INFO_ROWS = [
 ];
 
 const TABS: { key: FormType; icon: React.ReactNode; label: string }[] = [
-  {
-    key: "contact",
-    icon: <MessageSquare className="w-3.5 h-3.5" />,
-    label: "Contact",
-  },
-  {
-    key: "appointment",
-    icon: <Calendar className="w-3.5 h-3.5" />,
-    label: "Eye test",
-  },
-  {
-    key: "booking",
-    icon: <ShoppingBag className="w-3.5 h-3.5" />,
-    label: "Book frames",
-  },
+  { key: "contact", icon: <MessageSquare className="w-3.5 h-3.5" />, label: "Contact" },
+  { key: "appointment", icon: <Calendar className="w-3.5 h-3.5" />, label: "Eye test" },
+  { key: "booking", icon: <ShoppingBag className="w-3.5 h-3.5" />, label: "Book frames" },
 ];
 
 const inputCls =
@@ -86,19 +79,113 @@ const inputCls =
 
 const ContactSection: React.FC = () => {
   const [formType, setFormType] = useState<FormType>("contact");
+  const [loading, setLoading] = useState(false);
+  
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    message: "",
+    date: "",
+    slot: "Morning slot",
+    frameModel: "",
+    lens: "Blue light filter",
+  });
+
+  useEffect(() => {
+    const syncFormType = () => {
+      const hash = window.location.hash.toLowerCase();
+      if (hash === "#contact-booking") {
+        setFormType("booking");
+      } else if (hash === "#contact-appointment") {
+        setFormType("appointment");
+      } else if (hash === "#contact") {
+        setFormType("contact");
+      }
+    };
+
+    syncFormType();
+    window.addEventListener("hashchange", syncFormType);
+    return () => window.removeEventListener("hashchange", syncFormType);
+  }, []);
+
   const cfg = FORM_CONFIG[formType];
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    // Dynamic mapping for Sheety Root Keys
+    // 'appointment' maps to 'eyeTest' to match your "Eye Test" sheet tab
+    const sheetKeyMap: Record<FormType, string> = {
+      contact: "contact",
+      appointment: "eyeTest", 
+      booking: "bookFrame",
+    };
+
+    const endpointMap: Record<FormType, string> = {
+      contact: API.CONTACT,
+      appointment: API.EYE_TEST,
+      booking: API.BOOK_FRAME,
+    };
+
+    // Construct the payload according to your Google Sheet headers
+    const payload = {
+      [sheetKeyMap[formType]]: {
+        name: formData.name,
+        email: formData.email,
+        message: formData.message,
+        ...(formType === "appointment" && {
+          date: formData.date,
+          slot: formData.slot,
+        }),
+        ...(formType === "booking" && {
+          frameModel: formData.frameModel,
+          lens: formData.lens,
+        }),
+      }
+    };
+
+    try {
+      await axios.post(endpointMap[formType], payload);
+      alert("Submission successful! We will get back to you shortly.");
+      
+      // Reset form
+      setFormData({
+        name: "", email: "", message: "", 
+        date: "", slot: "Morning slot", 
+        frameModel: "", lens: "Blue light filter"
+      });
+    } catch (err: any) {
+      console.error("Submission error:", err.response?.data || err.message);
+      // Helpful alert for the common 403 error
+      if (err.response?.status === 403) {
+        alert("Access Denied (403): Please ensure POST permissions are enabled in your Sheety dashboard settings for this sheet.");
+      } else {
+        alert("Failed to send your request. Please check your connection and try again.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <section className="py-24 bg-slate-50">
+    <section id="contact" className="relative scroll-mt-28 py-24 bg-slate-50">
+      <span id="contact-appointment" className="block scroll-mt-28 h-0" />
+      <span id="contact-booking" className="block scroll-mt-28 h-0" />
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-[7fr_4fr] gap-6 items-stretch">
-          {/* ── LEFT: Form ── */}
+          
           <div className="bg-white border border-slate-100 rounded-[28px] p-8 md:p-12">
             {/* Tab switcher */}
             <div className="flex gap-1 bg-slate-100 p-1 rounded-2xl w-fit mb-8">
               {TABS.map(({ key, icon, label }) => (
                 <button
                   key={key}
+                  type="button"
                   onClick={() => setFormType(key)}
                   className={[
                     "flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-150",
@@ -113,7 +200,6 @@ const ContactSection: React.FC = () => {
               ))}
             </div>
 
-            {/* Title */}
             <div className="mb-8">
               <h2 className="text-2xl font-semibold text-slate-900 tracking-tight">
                 {cfg.title}
@@ -121,8 +207,7 @@ const ContactSection: React.FC = () => {
               <p className="mt-1.5 text-sm text-slate-500">{cfg.sub}</p>
             </div>
 
-            <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
-              {/* Base fields */}
+            <form className="space-y-5" onSubmit={handleSubmit}>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div className="space-y-2">
                   <label className="block text-[11px] font-medium text-slate-500 uppercase tracking-widest">
@@ -130,7 +215,11 @@ const ContactSection: React.FC = () => {
                   </label>
                   <input
                     type="text"
-                    placeholder="Gayathri Devi"
+                    name="name"
+                    required
+                    value={formData.name}
+                    onChange={handleChange}
+                    placeholder="Enter your name"
                     className={inputCls}
                   />
                 </div>
@@ -140,34 +229,48 @@ const ContactSection: React.FC = () => {
                   </label>
                   <input
                     type="email"
+                    name="email"
+                    required
+                    value={formData.email}
+                    onChange={handleChange}
                     placeholder="example@gmail.com"
                     className={inputCls}
                   />
                 </div>
               </div>
 
-              {/* Eye test extras */}
               {formType === "appointment" && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div className="space-y-2">
                     <label className="block text-[11px] font-medium text-slate-500 uppercase tracking-widest">
                       Appointment date
                     </label>
-                    <input type="date" className={inputCls} />
+                    <input 
+                      type="date" 
+                      name="date" 
+                      required
+                      value={formData.date}
+                      onChange={handleChange}
+                      className={inputCls} 
+                    />
                   </div>
                   <div className="space-y-2">
                     <label className="block text-[11px] font-medium text-slate-500 uppercase tracking-widest">
                       Preferred slot
                     </label>
-                    <select className={inputCls + " appearance-none"}>
-                      <option>Morning slot</option>
-                      <option>Afternoon slot</option>
+                    <select 
+                      name="slot"
+                      value={formData.slot}
+                      onChange={handleChange}
+                      className={inputCls + " appearance-none"}
+                    >
+                      <option value="Morning slot">Morning slot</option>
+                      <option value="Afternoon slot">Afternoon slot</option>
                     </select>
                   </div>
                 </div>
               )}
 
-              {/* Frame booking extras */}
               {formType === "booking" && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div className="space-y-2">
@@ -176,6 +279,10 @@ const ContactSection: React.FC = () => {
                     </label>
                     <input
                       type="text"
+                      name="frameModel"
+                      required
+                      value={formData.frameModel}
+                      onChange={handleChange}
                       placeholder="e.g. Aviator-X20"
                       className={inputCls}
                     />
@@ -184,55 +291,57 @@ const ContactSection: React.FC = () => {
                     <label className="block text-[11px] font-medium text-slate-500 uppercase tracking-widest">
                       Lens preference
                     </label>
-                    <select className={inputCls + " appearance-none"}>
-                      <option>Blue light filter</option>
-                      <option>Anti-glare / premium</option>
-                      <option>Photochromic (transition)</option>
+                    <select 
+                      name="lens"
+                      value={formData.lens}
+                      onChange={handleChange}
+                      className={inputCls + " appearance-none"}
+                    >
+                      <option value="Blue light filter">Blue light filter</option>
+                      <option value="Anti-glare / premium">Anti-glare / premium</option>
+                      <option value="Photochromic (transition)">Photochromic (transition)</option>
                     </select>
                   </div>
                 </div>
               )}
 
-              {/* Message */}
               <div className="space-y-2">
                 <label className="block text-[11px] font-medium text-slate-500 uppercase tracking-widest">
                   {cfg.msgLabel}
                 </label>
                 <textarea
                   rows={5}
+                  name="message"
+                  required
+                  value={formData.message}
+                  onChange={handleChange}
                   placeholder="Describe your requirements..."
                   className={inputCls + " resize-none"}
                 />
               </div>
 
-              {/* Submit */}
               <button
                 type="submit"
-                className="w-full py-4 bg-green-600 hover:bg-green-700 active:scale-[0.98] text-white text-sm font-semibold rounded-2xl shadow-md shadow-green-600/20 transition-all duration-150"
+                disabled={loading}
+                className="w-full py-4 bg-green-600 hover:bg-green-700 active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-2xl shadow-md shadow-green-600/20 transition-all duration-150 flex items-center justify-center gap-2"
               >
-                {cfg.btn}
+                {loading && <Loader2 className="w-4 h-4 animate-spin" />}
+                {loading ? "Sending..." : cfg.btn}
               </button>
             </form>
           </div>
 
-          {/* ── RIGHT: Info panel ── */}
           <div className="bg-green-600 rounded-[28px] p-8 md:p-10 flex flex-col">
-            {/* Brand mark */}
             <div className="flex items-center gap-3 mb-10">
               <div className="w-11 h-11 bg-white/20 rounded-2xl flex items-center justify-center">
                 <Eye className="w-5 h-5 text-white" />
               </div>
               <div>
-                <p className="text-base font-semibold text-white leading-none">
-                  Brite Vision
-                </p>
-                <p className="text-xs text-white/60 mt-1">
-                  Optical care centre
-                </p>
+                <p className="text-base font-semibold text-white leading-none">Brite Vision</p>
+                <p className="text-xs text-white/60 mt-1">Optical care centre</p>
               </div>
             </div>
 
-            {/* Info rows */}
             <div className="flex flex-col flex-1">
               {INFO_ROWS.map((row, i) => (
                 <div
@@ -246,19 +355,14 @@ const ContactSection: React.FC = () => {
                     {row.icon}
                   </div>
                   <div>
-                    <p className="text-[11px] font-medium text-white/55 uppercase tracking-widest mb-1.5">
-                      {row.label}
-                    </p>
-                    <p className="text-sm font-semibold text-white leading-snug">
-                      {row.text}
-                    </p>
+                    <p className="text-[11px] font-medium text-white/55 uppercase tracking-widest mb-1.5">{row.label}</p>
+                    <p className="text-sm font-semibold text-white leading-snug">{row.text}</p>
                     <p className="text-xs text-white/65 mt-1">{row.sub}</p>
                   </div>
                 </div>
               ))}
             </div>
 
-            {/* Footer note */}
             <div className="mt-8 pt-6 border-t border-white/15">
               <p className="text-xs text-white/50 leading-relaxed">
                 We usually respond within a few hours on working days.
