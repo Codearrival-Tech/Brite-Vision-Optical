@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Star, Plus, Loader2, X } from "lucide-react";
 import { API } from "../api/axios";
+import TestimonialCard from "@/Pages/Component/TestimonialCard";
 import {
   Carousel,
   CarouselContent,
@@ -11,7 +12,14 @@ import {
 } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 
-const testimonials = [
+interface Testimonial {
+  name: string;
+  phone: string;
+  message: string;
+  rating: number;
+}
+
+const initialTestimonials: Testimonial[] = [
   {
     name: "Jenny Wilson",
     phone: "+1 (555) 000-1234",
@@ -34,44 +42,33 @@ const testimonials = [
   },
 ];
 
-const getInitials = (name: string) =>
-  name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
-
-const maskPhone = (phone: string) => {
-  const digits = phone.replace(/\D/g, ""); // "919876543210"
-  const visiblePart = digits.slice(0, -5); // "9198765"
-  const maskedDigits = visiblePart + "*****"; // "9198765*****"
-
-  let result = "";
-  let digitIndex = 0;
-
-  for (const char of phone) {
-    if (/\d/.test(char)) {
-      result += maskedDigits[digitIndex] ?? "*";
-      digitIndex++;
-    } else {
-      result += char; // keep +, spaces, dashes, ()
-    }
-  }
-
-  return result;
-};
-
 const TestimonialSection: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [happyUsers, setHappyUsers] = useState(3940);
+  const [happyUsers, setHappyUsers] = useState(() => {
+    const saved = localStorage.getItem('happyUsers');
+    return saved ? parseInt(saved, 10) : 3940;
+  });
+  const [testimonials, setTestimonials] = useState<Testimonial[]>(() => {
+    const saved = localStorage.getItem('testimonials');
+    return saved ? JSON.parse(saved) : initialTestimonials;
+  });
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
     message: "",
     rating: 5,
   });
+
+  // Save testimonials to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('testimonials', JSON.stringify(testimonials));
+  }, [testimonials]);
+
+  // Save happy users count to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('happyUsers', happyUsers.toString());
+  }, [happyUsers]);
 
   const plugin = React.useRef(
     Autoplay({ delay: 4000, stopOnInteraction: true }),
@@ -90,6 +87,18 @@ const TestimonialSection: React.FC = () => {
     try {
       await axios.post(API.FEEDBACK, { feedback: formData });
       alert("Thank you for your feedback!");
+      
+      // Add new testimonial to the carousel
+      setTestimonials((prev) => [
+        ...prev,
+        {
+          name: formData.name,
+          phone: formData.phone,
+          message: formData.message,
+          rating: formData.rating,
+        },
+      ]);
+      
       setFormData({ name: "", phone: "", message: "", rating: 5 });
       setShowForm(false);
       setHappyUsers((prev) => prev + 1);
@@ -135,50 +144,7 @@ const TestimonialSection: React.FC = () => {
           <CarouselContent className="-ml-4">
             {testimonials.map((t, i) => (
               <CarouselItem key={i} className="pl-4 md:basis-1/2">
-                <div className="h-full bg-white rounded-2xl border border-stone-200 p-8 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between relative overflow-hidden min-h-[220px]">
-                  {/* Corner accent */}
-                  <div className="absolute top-0 right-0 w-28 h-28 bg-gradient-to-bl from-green-50 to-transparent rounded-bl-3xl pointer-events-none" />
-
-                  {/* Giant quote mark */}
-                  <span className="absolute top-4 left-7 font-serif text-7xl leading-none text-green-600 opacity-10 select-none">
-                    "
-                  </span>
-
-                  <div className="relative z-10">
-                    {/* Stars */}
-                    <div className="flex gap-0.5 mb-5">
-                      {[...Array(5)].map((_, s) => (
-                        <Star
-                          key={s}
-                          size={14}
-                          className={
-                            s < t.rating
-                              ? "fill-green-600 text-green-600"
-                              : "fill-stone-200 text-stone-200"
-                          }
-                        />
-                      ))}
-                    </div>
-                    <blockquote className="font-serif text-lg font-bold italic text-stone-800 leading-relaxed mb-7">
-                      "{t.message}"
-                    </blockquote>
-                  </div>
-
-                  {/* Author */}
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-600 to-green-400 flex items-center justify-center text-white text-sm font-bold shrink-0">
-                      {getInitials(t.name)}
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-stone-900">
-                        {t.name}
-                      </p>
-                      <p className="text-xs text-stone-400 tracking-wide">
-                        {maskPhone(t.phone)}
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                <TestimonialCard testimonial={t} />
               </CarouselItem>
             ))}
           </CarouselContent>
