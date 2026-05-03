@@ -36,13 +36,19 @@ const Hero: React.FC = () => {
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-5">
-          <button className="w-full sm:w-auto px-10 py-4 bg-[var(--brand-primary)] hover:bg-[var(--brand-primary-dark)] text-white font-bold rounded-[var(--radius)] transition-all shadow-lg shadow-[var(--brand-primary)]/20 transform hover:-translate-y-1">
+          <a
+            href="#contact-appointment"
+            className="w-full sm:w-auto inline-flex items-center justify-center px-10 py-4 bg-[var(--brand-primary)] hover:bg-[var(--brand-primary-dark)] text-white font-bold rounded-[var(--radius)] transition-all shadow-lg shadow-[var(--brand-primary)]/20 transform hover:-translate-y-1"
+          >
             Book Eye Test
-          </button>
+          </a>
           
-          <button className="w-full sm:w-auto px-10 py-4 border-2 border-white/30 bg-white/10 backdrop-blur-md text-white font-bold rounded-[var(--radius)] hover:bg-white hover:text-black transition-all">
+          <a
+            href="#contact-booking"
+            className="w-full sm:w-auto inline-flex items-center justify-center px-10 py-4 border-2 border-white/30 bg-white/10 backdrop-blur-md text-white font-bold rounded-[var(--radius)] hover:bg-white hover:text-black transition-all"
+          >
             Explore Frames
-          </button>
+          </a>
         </div>
       </div>
 

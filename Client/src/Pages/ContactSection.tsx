@@ -87,6 +87,7 @@ const ContactSection: React.FC = () => {
     message: "",
     date: "",
     slot: "Morning slot",
+    time: "",
     frameModel: "",
     lens: "Blue light filter",
   });
@@ -141,8 +142,11 @@ const ContactSection: React.FC = () => {
         ...(formType === "appointment" && {
           date: formData.date,
           slot: formData.slot,
+          time: formData.time,
         }),
+
         ...(formType === "booking" && {
+          date: formData.date,
           frameModel: formData.frameModel,
           lens: formData.lens,
         }),
@@ -156,7 +160,7 @@ const ContactSection: React.FC = () => {
       // Reset form
       setFormData({
         name: "", email: "", message: "", 
-        date: "", slot: "Morning slot", 
+        date: "", slot: "Morning slot", time: "", 
         frameModel: "", lens: "Blue light filter"
       });
     } catch (err: any) {
@@ -240,7 +244,7 @@ const ContactSection: React.FC = () => {
               </div>
 
               {formType === "appointment" && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
                   <div className="space-y-2">
                     <label className="block text-[11px] font-medium text-slate-500 uppercase tracking-widest">
                       Appointment date
@@ -266,13 +270,68 @@ const ContactSection: React.FC = () => {
                     >
                       <option value="Morning slot">Morning slot</option>
                       <option value="Afternoon slot">Afternoon slot</option>
+                      <option value="Evening slot">Evening slot</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-[11px] font-medium text-slate-500 uppercase tracking-widest">
+                      Time
+                    </label>
+                    <select
+                      name="time"
+                      required
+                      value={formData.time}
+                      onChange={handleChange}
+                      className={inputCls}
+                    >
+                      <option value="">Select time</option>
+
+                      {/* Morning */}
+                      {formData.slot === "Morning slot" && (
+                        <>
+                          <option>09:00 AM</option>
+                          <option>10:00 AM</option>
+                          <option>11:00 AM</option>
+                        </>
+                      )}
+
+                      {/* Afternoon */}
+                      {formData.slot === "Afternoon slot" && (
+                        <>
+                          <option>12:00 PM</option>
+                          <option>01:00 PM</option>
+                          <option>02:00 PM</option>
+                        </>
+                      )}
+
+                      {/* Evening */}
+                      {formData.slot === "Evening slot" && (
+                        <>
+                          <option>04:00 PM</option>
+                          <option>05:00 PM</option>
+                          <option>06:00 PM</option>
+                        </>
+                      )}
                     </select>
                   </div>
                 </div>
               )}
 
               {formType === "booking" && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                  <div className="space-y-2">
+                    <label className="block text-[11px] font-medium text-slate-500 uppercase tracking-widest">
+                      Appointment date
+                    </label>
+                    <input
+                      type="date"
+                      name="date"
+                      required
+                      value={formData.date}
+                      onChange={handleChange}
+                      className={inputCls}
+                    />
+                  </div>
                   <div className="space-y-2">
                     <label className="block text-[11px] font-medium text-slate-500 uppercase tracking-widest">
                       Frame model / ID
@@ -291,7 +350,7 @@ const ContactSection: React.FC = () => {
                     <label className="block text-[11px] font-medium text-slate-500 uppercase tracking-widest">
                       Lens preference
                     </label>
-                    <select 
+                    <select
                       name="lens"
                       value={formData.lens}
                       onChange={handleChange}

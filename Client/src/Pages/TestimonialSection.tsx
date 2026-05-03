@@ -8,7 +8,7 @@ const TestimonialSection: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
-    role: "",
+    phonenumber:"",
     rating: "5",
     text: ""
   });
@@ -49,7 +49,7 @@ const TestimonialSection: React.FC = () => {
     try {
       await axios.post(API.FEEDBACK, payload);
       alert("Thank you for your feedback!");
-      setFormData({ name: "", role: "", rating: "5", text: "" });
+      setFormData({ name: "", phonenumber: "", rating: "5", text: "" });
       setShowForm(false);
     } catch (err: any) {
       console.error("Feedback error:", err);
@@ -109,10 +109,10 @@ const TestimonialSection: React.FC = () => {
                   />
                   <input
                     type="text"
-                    name="role"
-                    placeholder="Role / Company"
+                    name="phonenumber"
+                    placeholder="Phone Number"
                     required
-                    value={formData.role}
+                    value={formData.phonenumber}
                     onChange={handleChange}
                     className="w-full px-4 py-3.5 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none transition-all"
                   />
