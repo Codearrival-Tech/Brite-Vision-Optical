@@ -1,7 +1,4 @@
-// src/config/api.ts
-
-const BASE_URL = "https://api.sheety.co/abc31af85b33bcfb91461a4748f5f46e/briteVisionOpticalLeadGeneration";
-
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 export const API = {
   CONTACT: `${BASE_URL}/contact`,
   EYE_TEST: `${BASE_URL}/eyeTest`,
