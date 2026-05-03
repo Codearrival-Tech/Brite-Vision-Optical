@@ -84,6 +84,7 @@ const ContactSection: React.FC = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    phone: "",
     message: "",
     date: "",
     slot: "Morning slot",
@@ -138,6 +139,7 @@ const ContactSection: React.FC = () => {
       [sheetKeyMap[formType]]: {
         name: formData.name,
         email: formData.email,
+        phone: formData.phone,
         message: formData.message,
         ...(formType === "appointment" && {
           date: formData.date,
@@ -159,7 +161,7 @@ const ContactSection: React.FC = () => {
       
       // Reset form
       setFormData({
-        name: "", email: "", message: "", 
+        name: "", email: "", phone: "", message: "", 
         date: "", slot: "Morning slot", time: "", 
         frameModel: "", lens: "Blue light filter"
       });
@@ -212,7 +214,7 @@ const ContactSection: React.FC = () => {
             </div>
 
             <form className="space-y-5" onSubmit={handleSubmit}>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
                 <div className="space-y-2">
                   <label className="block text-[11px] font-medium text-slate-500 uppercase tracking-widest">
                     Full name
@@ -238,6 +240,20 @@ const ContactSection: React.FC = () => {
                     value={formData.email}
                     onChange={handleChange}
                     placeholder="example@gmail.com"
+                    className={inputCls}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-[11px] font-medium text-slate-500 uppercase tracking-widest">
+                    Phone number
+                  </label>
+                  <input
+                    type="tel"
+                    name="phone"
+                    required
+                    value={formData.phone}
+                    onChange={handleChange}
+                    placeholder="+1 (555) 000-1234"
                     className={inputCls}
                   />
                 </div>
