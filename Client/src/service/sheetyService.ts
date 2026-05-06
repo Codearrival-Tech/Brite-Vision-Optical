@@ -23,3 +23,8 @@ export const createBooking = async (data: any) => {
   });
   return res.data;
 };
+
+export const fetchTestimonials = async () => {
+  const res = await axios.get(API.FEEDBACK);
+  return res.data;
+};

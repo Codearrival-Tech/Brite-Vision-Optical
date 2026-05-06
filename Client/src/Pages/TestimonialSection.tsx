@@ -3,6 +3,7 @@ import axios from "axios";
 import { Star, Plus, Loader2, X } from "lucide-react";
 import { API } from "../api/axios";
 import TestimonialCard from "@/Pages/Component/TestimonialCard";
+import { fetchTestimonials } from "@/service/sheetyService";
 import {
   Carousel,
   CarouselContent,
@@ -19,40 +20,11 @@ interface Testimonial {
   rating: number;
 }
 
-const initialTestimonials: Testimonial[] = [
-  {
-    name: "Jenny Wilson",
-    phone: "+1 (555) 000-1234",
-    message:
-      "We love Landingfolio! Our designers were using it for their projects, so we already knew what kind of design they want.",
-    rating: 5,
-  },
-  {
-    name: "Devon Lane",
-    phone: "+1 (555) 000-5678",
-    message:
-      "We love Landingfolio! Our designers were using it for their projects, so we already knew what kind of design they want.",
-    rating: 5,
-  },
-  {
-    name: "Babu",
-    phone: "+91 98765 43210",
-    message: "Good",
-    rating: 5,
-  },
-];
-
 const TestimonialSection: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [happyUsers, setHappyUsers] = useState(() => {
-    const saved = localStorage.getItem('happyUsers');
-    return saved ? parseInt(saved, 10) : 3940;
-  });
-  const [testimonials, setTestimonials] = useState<Testimonial[]>(() => {
-    const saved = localStorage.getItem('testimonials');
-    return saved ? JSON.parse(saved) : initialTestimonials;
-  });
+  const [loadingTestimonials, setLoadingTestimonials] = useState(true);
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -60,15 +32,22 @@ const TestimonialSection: React.FC = () => {
     rating: 5,
   });
 
-  // Save testimonials to localStorage whenever they change
+  // Fetch testimonials from API on component mount
   useEffect(() => {
-    localStorage.setItem('testimonials', JSON.stringify(testimonials));
-  }, [testimonials]);
-
-  // Save happy users count to localStorage whenever it changes
-  useEffect(() => {
-    localStorage.setItem('happyUsers', happyUsers.toString());
-  }, [happyUsers]);
+    const loadTestimonials = async () => {
+      try {
+        setLoadingTestimonials(true);
+        const data = await fetchTestimonials();
+        setTestimonials(data.feedbacks || []);
+      } catch (error) {
+        console.error("Failed to fetch testimonials:", error);
+        setTestimonials([]);
+      } finally {
+        setLoadingTestimonials(false);
+      }
+    };
+    loadTestimonials();
+  }, []);
 
   const plugin = React.useRef(
     Autoplay({ delay: 4000, stopOnInteraction: true }),
@@ -101,7 +80,6 @@ const TestimonialSection: React.FC = () => {
       
       setFormData({ name: "", phone: "", message: "", rating: 5 });
       setShowForm(false);
-      setHappyUsers((prev) => prev + 1);
     } catch {
       alert("Failed to submit. Please check your connection.");
     } finally {
@@ -129,31 +107,41 @@ const TestimonialSection: React.FC = () => {
             </h2>
           </div>
           <span className="shrink-0 bg-stone-900 text-stone-50 text-xs font-medium px-5 py-2.5 rounded-full tracking-wide whitespace-nowrap">
-            {happyUsers.toLocaleString()}+ happy users
+            {testimonials.length.toLocaleString()}+ happy users
           </span>
         </div>
 
         {/* ── Carousel ── */}
-        <Carousel
-          plugins={[plugin.current]}
-          opts={{ align: "start", loop: true }}
-          className="w-full"
-          onMouseEnter={plugin.current.stop}
-          onMouseLeave={plugin.current.reset}
-        >
-          <CarouselContent className="-ml-4">
-            {testimonials.map((t, i) => (
-              <CarouselItem key={i} className="pl-4 md:basis-1/2">
-                <TestimonialCard testimonial={t} />
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-
-          <div className="flex items-center gap-2 mt-8">
-            <CarouselPrevious className="static translate-y-0 border-stone-300 hover:bg-stone-900 hover:text-white hover:border-stone-900 transition-all rounded-full" />
-            <CarouselNext className="static translate-y-0 border-stone-300 hover:bg-stone-900 hover:text-white hover:border-stone-900 transition-all rounded-full" />
+        {loadingTestimonials ? (
+          <div className="py-12 text-center text-stone-400">
+            Loading testimonials...
           </div>
-        </Carousel>
+        ) : testimonials.length > 0 ? (
+          <Carousel
+            plugins={[plugin.current]}
+            opts={{ align: "start", loop: true }}
+            className="w-full"
+            onMouseEnter={plugin.current.stop}
+            onMouseLeave={plugin.current.reset}
+          >
+            <CarouselContent className="-ml-4">
+              {testimonials.map((t, i) => (
+                <CarouselItem key={i} className="pl-4 md:basis-1/2">
+                  <TestimonialCard testimonial={t} />
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+
+            <div className="flex items-center gap-2 mt-8">
+              <CarouselPrevious className="static translate-y-0 border-stone-300 hover:bg-stone-900 hover:text-white hover:border-stone-900 transition-all rounded-full" />
+              <CarouselNext className="static translate-y-0 border-stone-300 hover:bg-stone-900 hover:text-white hover:border-stone-900 transition-all rounded-full" />
+            </div>
+          </Carousel>
+        ) : (
+          <div className="py-12 text-center text-stone-400">
+            No testimonials yet. Be the first to share your feedback!
+          </div>
+        )}
 
         {/* ── CTA ── */}
         <div className="mt-10">
