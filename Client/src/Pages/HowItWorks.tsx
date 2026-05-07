@@ -1,4 +1,8 @@
 import React from 'react';
+import tryon from '../assets/tryon.png'
+import eyetest from '../assets/eyetest.jpg'
+import eyeglass from '../assets/eyeglass2.jpg'
+
 
 const steps = [
   {
@@ -11,19 +15,19 @@ const steps = [
     number: "02",
     title: "Virtual Try-On",
     description: "Use our AI-powered tool to see exactly how each frame fits your face shape in real-time.",
-    image: "https://images.unsplash.com/photo-1556761175-b413da4baf72?q=80&w=1000&auto=format&fit=crop"
+    image: tryon
   },
   {
     number: "03",
     title: "Book Eye Test",
     description: "Schedule a comprehensive eye exam with our expert optometrists at your nearest boutique.",
-    image: "https://images.unsplash.com/photo-1582750433449-648ed127bb54?q=80&w=1000&auto=format&fit=crop"
+    image: eyetest
   },
   {
     number: "04",
     title: "Custom Fitting",
     description: "Receive your perfectly adjusted glasses with our signature 2-year quality guarantee.",
-    image: "https://images.unsplash.com/photo-1574258495973-f010dfbb5371?q=80&w=1000&auto=format&fit=crop"
+    image: eyeglass
   }
 ];
 

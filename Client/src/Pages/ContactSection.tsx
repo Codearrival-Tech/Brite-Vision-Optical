@@ -42,13 +42,13 @@ const INFO_ROWS = [
   {
     icon: <MapPin className="w-[18px] h-[18px] text-white" />,
     label: "Address",
-    text: "Schamberger Pass",
-    sub: "Coimbatore, India",
+    text: "55, Gandhi Road, oop to Indian Overseas Bank, Panruti - 607106",
+    sub: "Panruti - 607106, India",
   },
   {
     icon: <Phone className="w-[18px] h-[18px] text-white" />,
     label: "Phone",
-    text: "1800-14-0147",
+    text: "99623-06965",
     sub: "Mon–Sat, 9am–6pm",
   },
   {

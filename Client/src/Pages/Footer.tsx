@@ -85,16 +85,16 @@ const Footer: React.FC = () => {
               <li className="flex items-start gap-3 group">
                 <MapPin className="text-emerald-600 shrink-0 mt-1" size={18} />
                 <span className="text-slate-500 font-medium text-sm leading-relaxed">
-                  3680 Schamberger Pass, North Catalina, Coimbatore, India
+                  55, Gandhi Road, oop.to Indian Overseas Bank, Panruti - 607106
                 </span>
               </li>
               <li className="flex items-center gap-3 group">
                 <Phone className="text-emerald-600 shrink-0" size={18} />
-                <span className="text-slate-500 font-medium text-sm">1800-14-0147</span>
+                <span className="text-slate-500 font-medium text-sm">99623-06965</span>
               </li>
               <li className="flex items-center gap-3 group">
                 <Mail className="text-emerald-600 shrink-0" size={18} />
-                <span className="text-slate-500 font-medium text-sm">care@lenskart.com</span>
+                <span className="text-slate-500 font-medium text-sm">care@britevision.com</span>
               </li>
             </ul>
           </div>
@@ -152,7 +152,7 @@ const Footer: React.FC = () => {
         {/* Bottom Bar */}
         <div className="pt-12 border-t border-slate-100 flex flex-col md:flex-row items-center justify-between gap-6">
           <p className="text-slate-400 font-bold text-xs uppercase tracking-widest">
-            © {currentYear} Brite Vision Coimbatore. All Rights Reserved.
+            © {currentYear} Brite Vision Panruti. All Rights Reserved.
           </p>
           <div className="flex items-center gap-8">
             <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Secure Payments via</span>
