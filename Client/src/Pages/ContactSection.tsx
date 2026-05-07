@@ -54,7 +54,7 @@ const INFO_ROWS = [
   {
     icon: <Mail className="w-[18px] h-[18px] text-white" />,
     label: "Email",
-    text: "care@britevision.com",
+    text: "rkbritevisionoptical@gmail.com",
     sub: "24/7 online support",
   },
   {
